@@ -19,7 +19,7 @@ module CGRateS
       end
     end
 
-    describe "#set_tp_destination", :allow_net_connect do
+    describe "#set_tp_destination" do
       it "executes the request" do
         client = build_client
 
