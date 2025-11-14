@@ -54,6 +54,7 @@ client.get_tp_rate(tp_id: "cgrates_client_test", id: "Cambodia_Mobile")
 client.set_tp_destination_rate(tp_id: "cgrates_client_test", id: "Cambodia_Mobile", destination_rates: [{rounding_decimals: 4, rate_id: "Cambodia_Mobile", destination_id: "Cambodia_Mobile", rounding_method: "*up" }])
 => #<data Response id="b3c02025-d2d3-430f-981f-cc4065a278e5", result="OK">
 
+client.get_tp_destination_rate(tp_id: "cgrates_client_test", id: "Cambodia_Mobile")
 #<data Response
  id="67c7972f-e059-43c3-8cd8-c61471c2c624",
  result=
