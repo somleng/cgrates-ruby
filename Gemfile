@@ -5,9 +5,18 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in cgrates.gemspec
 gemspec
 
-gem "irb"
-gem "rake", "~> 13.0"
+group :development do
+  gem "pry"
+  gem "rake"
+  gem "rubocop"
+  gem "rubocop-rails-omakase"
+  gem "rubocop-rspec"
+  gem "rubocop-performance"
+end
 
-gem "rspec", "~> 3.0"
-
-gem "rubocop", "~> 1.21"
+group :test do
+  gem "rspec"
+  gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
+  gem "webmock"
+end

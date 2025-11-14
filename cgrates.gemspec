@@ -5,8 +5,8 @@ require_relative "lib/cgrates/version"
 Gem::Specification.new do |spec|
   spec.name = "cgrates"
   spec.version = CGRateS::VERSION
-  spec.authors = ["David Wilkie"]
-  spec.email = ["dwilkie@gmail.com"]
+  spec.authors = [ "David Wilkie" ]
+  spec.email = [ "dwilkie@gmail.com" ]
 
   spec.summary = "Ruby client for the CGRateS real-time charging and rating API."
   spec.description = <<~DESC
@@ -31,10 +31,10 @@ Gem::Specification.new do |spec|
   end
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
+  spec.require_paths = [ "lib" ]
 
   # Uncomment to register a new dependency of your gem
-  # spec.add_dependency "example-gem", "~> 1.0"
+  spec.add_dependency "faraday"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
