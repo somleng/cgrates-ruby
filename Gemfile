@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in cgrates-ruby.gemspec
+# Specify your gem's dependencies in cgrates.gemspec
 gemspec
 
 gem "irb"
