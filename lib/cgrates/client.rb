@@ -1,6 +1,5 @@
 require "faraday"
 require "json"
-require "pry"
 
 module CGRateS
   class Client

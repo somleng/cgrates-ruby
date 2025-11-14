@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "cgrates"
+require "pry"
 
 Dir[File.join(__dir__, "support", "**", "*.rb")].each { |f| require f }
 
