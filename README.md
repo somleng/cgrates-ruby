@@ -1,5 +1,7 @@
 # CGRateS Ruby Client
 
+[![Build](https://github.com/somleng/cgrates-ruby/actions/workflows/build.yml/badge.svg)](https://github.com/somleng/cgrates-ruby/actions/workflows/build.yml)
+
 `cgrates` is a lightweight Ruby client for the [CGRateS](https://github.com/cgrates/cgrates) real-time charging and rating engine. It provides a simple, idiomatic interface for interacting with the CGRateS JSON-RPC API.
 
 ---
@@ -29,7 +31,17 @@ gem install cgrates
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+client = CGRateS::Client.new(host: "http://localhost:2080")
+client.ping
+=> #<data Response id="90ca9f67-0fc3-43a3-8856-7ce9209c668b", result="Pong">
+
+client.set_tp_destination(tp_id: "cgrates_client_test", id: "Cambodia_Mobile", prefixes: ["85510", "85512", "85597"])
+=> #<data Response id="875efcee-b480-4268-a41f-b5946d68597b", result="OK">
+
+client.get_tp_destination(tp_id: "cgrates_client_test", id: "Cambodia_Mobile")
+=> #<data Response id="3dccb2d6-8020-4891-bc21-ff954425bb0d", result={"TPid" => "cgrates_client_test", "ID" => "Cambodia_Mobile", "Prefixes" => ["85510", "85512", "85597"]}>
+```
 
 ## Development
 

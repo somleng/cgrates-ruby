@@ -6,6 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
+  gem "irb"
   gem "rake"
   gem "rubocop"
   gem "rubocop-rails-omakase"
