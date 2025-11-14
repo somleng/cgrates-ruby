@@ -41,6 +41,25 @@ client.set_tp_destination(tp_id: "cgrates_client_test", id: "Cambodia_Mobile", p
 
 client.get_tp_destination(tp_id: "cgrates_client_test", id: "Cambodia_Mobile")
 => #<data Response id="3dccb2d6-8020-4891-bc21-ff954425bb0d", result={"TPid" => "cgrates_client_test", "ID" => "Cambodia_Mobile", "Prefixes" => ["85510", "85512", "85597"]}>
+
+client.set_tp_rate(tp_id: "cgrates_client_test", id: "Cambodia_Mobile", rate_slots: [{ rate: 0.05, rate_unit: "60s", rate_increment: "60s" }])
+=> #<data Response id="0ae676c9-b12b-4da3-a2e2-bd7ae7c941da", result="OK">
+
+client.get_tp_rate(tp_id: "cgrates_client_test", id: "Cambodia_Mobile")
+=>
+#<data Response
+ id="10091598-fddb-4d55-8914-5e693a731dc5",
+ result={"TPid" => "cgrates_client_test", "ID" => "Cambodia_Mobile", "RateSlots" => [{"ConnectFee" => 0, "Rate" => 0.05, "RateUnit" => "60s", "RateIncrement" => "60s", "GroupIntervalStart" => ""}]}>
+
+client.set_tp_destination_rate(tp_id: "cgrates_client_test", id: "Cambodia_Mobile", destination_rates: [{rounding_decimals: 4, rate_id: "Cambodia_Mobile", destination_id: "Cambodia_Mobile", rounding_method: "*up" }])
+=> #<data Response id="b3c02025-d2d3-430f-981f-cc4065a278e5", result="OK">
+
+#<data Response
+ id="67c7972f-e059-43c3-8cd8-c61471c2c624",
+ result=
+  {"TPid" => "cgrates_client_test",
+   "ID" => "Cambodia_Mobile",
+   "DestinationRates" => [{"DestinationId" => "Cambodia_Mobile", "RateId" => "Cambodia_Mobile", "Rate" => nil, "RoundingMethod" => "*up", "RoundingDecimals" => 4, "MaxCost" => 0, "MaxCostStrategy" => ""}]}>
 ```
 
 ## Development
