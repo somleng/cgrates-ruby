@@ -3,7 +3,7 @@ require "json"
 
 module CGRateS
   class Client
-    class InvalidResponseError < StandardError; end
+    class APIError < StandardError; end
 
     attr_reader :host, :http_client, :jsonrpc_endpoint
 
@@ -23,25 +23,55 @@ module CGRateS
       api_request("APIerSv2.Ping")
     end
 
-    def set_tp_destination(tp_id:, id:, prefixes:)
-      api_request(
-        "APIerSv2.SetTPDestination",
-        {
-          "TPid" => tp_id,
-          "ID" => id,
-          "Prefixes" => prefixes
-        }
-      )
+    def set_tp_destination(prefixes:, **)
+      set_tp_resource("APIerSv2.SetTPDestination", **) do
+        { "Prefixes" => prefixes }
+      end
     end
 
-    def get_tp_destination(tp_id:, id:)
-      api_request(
-        "APIerSv1.GetTPDestination",
+    def get_tp_destination(**)
+      get_tp_resource("APIerSv1.GetTPDestination", **)
+    end
+
+    def set_tp_rate(rate_slots:, **)
+      set_tp_resource("APIerSv1.SetTPRate", **) do
         {
-          "TPid" => tp_id,
-          "ID" => id
+          "RateSlots" => rate_slots.map do
+            {
+              "ConnectFee" => it[:connect_fee],
+              "Rate" => it[:rate],
+              "RateUnit" => it[:rate_unit],
+              "RateIncrement" => it[:rate_increment],
+              "GroupIntervalStart" => it[:group_interval_start]
+            }
+          end
         }
-      )
+      end
+    end
+
+    def get_tp_rate(**)
+      get_tp_resource("APIerSv1.GetTPRate", **)
+    end
+
+    def set_tp_destination_rate(destination_rates:, **)
+      set_tp_resource("APIerSv1.SetTPDestinationRate", **) do
+        {
+          "DestinationRates" => destination_rates.map do
+            {
+              "RoundingDecimals" => it[:rounding_decimals],
+              "RateId" => it[:rate_id],
+              "MaxCost" => it[:max_cost],
+              "MaxCostStrategy" => it[:max_cost_strategy],
+              "DestinationId" => it[:destination_id],
+              "RoundingMethod" => it[:rounding_method]
+            }
+          end
+        }
+      end
+    end
+
+    def get_tp_destination_rate(**)
+      get_tp_resource("APIerSv1.GetTPDestinationRate", **)
     end
 
     private
@@ -64,13 +94,21 @@ module CGRateS
       end
 
       if error_message
-        raise(InvalidResponseError, "Invalid response from CGRateS API: #{error_message}")
+        raise(APIError, "Invalid response from CGRateS API: #{error_message}")
       end
 
       Response.new(
         id: response.body.fetch("id"),
         result: response.body.fetch("result")
       )
+    end
+
+    def set_tp_resource(method, tp_id:, id:, &)
+      api_request(method, { "TPid" => tp_id, "ID" => id }.merge(yield))
+    end
+
+    def get_tp_resource(method, tp_id:, id:)
+      api_request(method, { "TPid" => tp_id, "ID" => id })
     end
 
     def default_http_client(host, username:, password:)
