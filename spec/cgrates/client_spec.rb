@@ -118,26 +118,8 @@ module CGRateS
     describe "#set_tp_destination_rate" do
       it "executes the request" do
         client = build_client
-
-        stub_api_request(result: "OK")
-        client.set_tp_destination(
-          tp_id: "cgrates_client_test",
-          id: "Cambodia_Mobile",
-          prefixes: [ "85510" ]
-        )
-
-        stub_api_request(result: "OK")
-        client.set_tp_rate(
-          tp_id: "cgrates_client_test",
-          id: "Cambodia_Mobile_Rate",
-          rate_slots: [
-            {
-              rate: 0.05,
-              rate_unit: "60s",
-              rate_increment: "60s"
-            }
-          ]
-        )
+        set_tp_destination(client, tp_id: "cgrates_client_test", id: "Cambodia_Mobile")
+        set_tp_rate(client, tp_id: "cgrates_client_test", id: "Cambodia_Mobile_Rate")
 
         stub_api_request(result: "OK")
         response = client.set_tp_destination_rate(
@@ -195,6 +177,58 @@ module CGRateS
       end
     end
 
+    describe "#set_tp_rating_plan" do
+      it "executes the request" do
+        client = build_client
+        set_tp_destination_rate(client, tp_id: "cgrates_client_test", id: "Cambodia_Mobile_Destination_Rate")
+
+        stub_api_request(result: "OK")
+        response = client.set_tp_rating_plan(
+          tp_id: "cgrates_client_test",
+          id: "Test_Rating_Plan",
+          rating_plan_bindings: [
+            {
+              timing_id: "*any",
+              weight: 10,
+              destination_rates_id: "Cambodia_Mobile_Destination_Rate"
+            }
+          ]
+        )
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.SetTPRatingPlan")
+
+        stub_api_request(
+          result: {
+            "RatingPlanBindings" => [
+              {
+                "TimingId" => "*any",
+                "Weight" => 10,
+                "DestinationRatesId" => "Cambodia_Mobile_Destination_Rate"
+              }
+            ]
+          }
+        )
+
+        response = client.get_tp_rating_plan(
+          tp_id: "cgrates_client_test",
+          id: "Test_Rating_Plan"
+        )
+
+        expect(response).to have_attributes(
+          result: hash_including(
+            "RatingPlanBindings" => [
+              hash_including(
+                "TimingId" => "*any",
+                "Weight" => 10,
+                "DestinationRatesId" => "Cambodia_Mobile_Destination_Rate"
+              )
+            ]
+          )
+        )
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetTPRatingPlan")
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)
@@ -237,6 +271,54 @@ module CGRateS
       path = options.fetch(:path, "jsonrpc")
       have_requested(:post, "#{host}/#{path}").with(
         body: hash_including("method" => method)
+      )
+    end
+
+    def set_tp_destination(client, **params)
+      stub_api_request(result: "OK")
+      client.set_tp_destination(
+        tp_id: "cgrates_client_test",
+        id: "Cambodia_Mobile",
+        prefixes: [ "85510" ],
+        **params
+      )
+    end
+
+    def set_tp_rate(client, **params)
+      stub_api_request(result: "OK")
+      client.set_tp_rate(
+        tp_id: "cgrates_client_test",
+        id: "Cambodia_Mobile_Rate",
+        rate_slots: [
+          {
+            rate: 0.05,
+            rate_unit: "60s",
+            rate_increment: "60s"
+          }
+        ],
+        **params
+      )
+    end
+
+    def set_tp_destination_rate(client, **params)
+      set_tp_destination(client, tp_id: "cgrates_client_test", id: "Cambodia_Mobile")
+      set_tp_rate(client, tp_id: "cgrates_client_test", id: "Cambodia_Mobile_Rate")
+
+      stub_api_request(result: "OK")
+      client.set_tp_destination_rate(
+        tp_id: "cgrates_client_test",
+        id: "Cambodia_Mobile_Destination_Rate",
+        destination_rates: [
+          {
+            rounding_decimals: 4,
+            rate_id: "Cambodia_Mobile_Rate",
+            destination_id: "Cambodia_Mobile",
+            max_cost: 0,
+            max_cost_strategy: nil,
+            rounding_method: "*up"
+          }
+        ],
+        **params
       )
     end
   end

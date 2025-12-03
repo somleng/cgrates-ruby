@@ -74,6 +74,24 @@ module CGRateS
       get_tp_resource("APIerSv1.GetTPDestinationRate", **)
     end
 
+    def set_tp_rating_plan(rating_plan_bindings:, **)
+      set_tp_resource("APIerSv1.SetTPRatingPlan", **) do
+        {
+          "RatingPlanBindings" => rating_plan_bindings.map do
+            {
+              "TimingId" => it[:timing_id],
+              "Weight" => it[:weight],
+              "DestinationRatesId" => it[:destination_rates_id]
+            }
+          end
+        }
+      end
+    end
+
+    def get_tp_rating_plan(**)
+      get_tp_resource("APIerSv1.GetTPRatingPlan", **)
+    end
+
     private
 
     def api_request(method, *params)

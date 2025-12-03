@@ -61,6 +61,14 @@ client.get_tp_destination_rate(tp_id: "cgrates_client_test", id: "Cambodia_Mobil
   {"TPid" => "cgrates_client_test",
    "ID" => "Cambodia_Mobile",
    "DestinationRates" => [{"DestinationId" => "Cambodia_Mobile", "RateId" => "Cambodia_Mobile", "Rate" => nil, "RoundingMethod" => "*up", "RoundingDecimals" => 4, "MaxCost" => 0, "MaxCostStrategy" => ""}]}>
+client.set_tp_rating_plan(tp_id: "cgrates_client_test", id: "Test_Rating_Plan", rating_plan_bindings: [{ weight: 10, timing_id: "*any", destination_rates_id: "Cambodia_Mobile" }])
+=> #<data Response id="f7e9232d-1c5a-42e8-bfb6-072ae1124698", result="OK">
+
+client.get_tp_rating_plan(tp_id: "cgrates_client_test", id: "Test_Rating_Plan")
+=>
+#<data Response
+ id="ee134421-01dd-4a6b-b7a4-ee9980dc466e",
+ result={"TPid" => "cgrates_client_test", "ID" => "Test_Rating_Plan", "RatingPlanBindings" => [{"DestinationRatesId" => "Cambodia_Mobile", "TimingId" => "*any", "Weight" => 10}]}>
 ```
 
 ## Development
