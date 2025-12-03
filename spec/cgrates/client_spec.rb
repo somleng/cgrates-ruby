@@ -229,6 +229,74 @@ module CGRateS
       end
     end
 
+    describe "#set_tp_rating_profile" do
+      it "executes the request" do
+        client = build_client
+        set_tp_rating_plan(client, tp_id: "cgrates_client_test", id: "Test_Rating_Plan")
+
+        stub_api_request(result: "OK")
+        response = client.set_tp_rating_profile(
+          tp_id: "cgrates_client_test",
+          id: "Test_Rating_Profile",
+          load_id: "TEST",
+          category: "call",
+          tenant: "cgrates.org",
+          subject: "my-account",
+          rating_plan_activations: [
+            {
+              activation_time: "2025-12-03T19:55:23+07:00",
+              fallback_subjects: "foobar",
+              rating_plan_id: "Test_Rating_Plan"
+            }
+          ]
+        )
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.SetTPRatingProfile")
+
+        stub_api_request(
+          result: {
+            "LoadId" => "TEST",
+            "Tenant" => "cgrates.org",
+            "Category" => "call",
+            "Subject" => "my-account",
+            "RatingPlanActivations" => [
+              {
+                "ActivationTime" => "2025-12-03T19:55:23+07:00",
+                "FallbackSubjects" => "foobar",
+                "RatingPlanId" => "Test_Rating_Plan"
+              }
+            ]
+          }
+        )
+
+        response = client.get_tp_rating_profile(
+          tp_id: "cgrates_client_test",
+          load_id: "TEST",
+          tenant: "cgrates.org",
+          category: "call",
+          subject: "my-account"
+        )
+
+        expect(response).to have_attributes(
+          result: hash_including(
+            "LoadId" => "TEST",
+            "Tenant" => "cgrates.org",
+            "Category" => "call",
+            "Subject" => "my-account",
+            "RatingPlanActivations" => [
+              hash_including(
+                "ActivationTime" =>"2025-12-03T19:55:23+07:00",
+                "FallbackSubjects" => "foobar",
+                "RatingPlanId" => "Test_Rating_Plan"
+              )
+            ]
+          )
+        )
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetTPRatingProfile")
+      end
+    end
+
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)
@@ -316,6 +384,23 @@ module CGRateS
             max_cost: 0,
             max_cost_strategy: nil,
             rounding_method: "*up"
+          }
+        ],
+        **params
+      )
+    end
+
+    def set_tp_rating_plan(client, **params)
+      set_tp_destination_rate(client, tp_id: "cgrates_client_test", id: "Cambodia_Mobile_Destination_Rate")
+      stub_api_request(result: "OK")
+      client.set_tp_rating_plan(
+        tp_id: "cgrates_client_test",
+        id: "Test_Rating_Plan",
+        rating_plan_bindings: [
+          {
+            timing_id: "*any",
+            weight: 10,
+            destination_rates_id: "Cambodia_Mobile_Destination_Rate"
           }
         ],
         **params

@@ -69,6 +69,40 @@ client.get_tp_rating_plan(tp_id: "cgrates_client_test", id: "Test_Rating_Plan")
 #<data Response
  id="ee134421-01dd-4a6b-b7a4-ee9980dc466e",
  result={"TPid" => "cgrates_client_test", "ID" => "Test_Rating_Plan", "RatingPlanBindings" => [{"DestinationRatesId" => "Cambodia_Mobile", "TimingId" => "*any", "Weight" => 10}]}>
+
+client.set_tp_rating_profile(
+  tp_id: "cgrates_client_test",
+  id: "Test_Rating_Profile",
+  load_id: "TEST",
+  category: "call",
+  tenant: "cgrates.org",
+  subject: "my-account",
+  rating_plan_activations: [
+    {
+      activation_time: "2025-12-03T19:55:23+07:00",
+      fallback_subjects: "foobar",
+      rating_plan_id: "Test_Rating_Plan"
+    }
+  ]
+)
+=> #<data Response id="4827cf6e-54e2-4699-8801-d73b34b8331e", result="OK">
+client.get_tp_rating_profile(
+  tp_id: "cgrates_client_test",
+  load_id: "TEST",
+  tenant: "cgrates.org",
+  category: "call",
+  subject: "my-account"
+)
+=>
+#<data Response
+ id="210b6cc6-e7be-4a3f-b657-0c5e5f0666b2",
+ result=
+  {"TPid" => "cgrates_client_test",
+   "LoadId" => "TEST",
+   "Tenant" => "cgrates.org",
+   "Category" => "call",
+   "Subject" => "my-account",
+   "RatingPlanActivations" => [{"ActivationTime" => "2025-12-03T19:55:23+07:00", "RatingPlanId" => "Test_Rating_Plan", "FallbackSubjects" => "foobar"}]}>
 ```
 
 ## Development

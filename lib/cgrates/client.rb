@@ -92,6 +92,33 @@ module CGRateS
       get_tp_resource("APIerSv1.GetTPRatingPlan", **)
     end
 
+    def set_tp_rating_profile(rating_plan_activations:, load_id:, category:, subject:, tenant: nil, **)
+      set_tp_resource("APIerSv1.SetTPRatingProfile", **) do
+        {
+          "RatingPlanActivations" => rating_plan_activations.map do
+            {
+              "ActivationTime" => it[:activation_time],
+              "FallbackSubjects" => it[:fallback_subjects],
+              "RatingPlanId" => it[:rating_plan_id]
+            }
+          end,
+          "LoadId" => load_id,
+          "Category" => category,
+          "Subject" => subject,
+          "Tenant" => tenant
+        }
+      end
+    end
+
+    def get_tp_rating_profile(tp_id:, load_id:, tenant:, category:, subject:)
+      get_tp_resource(
+        "APIerSv1.GetTPRatingProfile",
+        tp_id:,
+        id: [ load_id, tenant, category, subject ].join(":"),
+        id_key: "RatingProfileId"
+      )
+    end
+
     private
 
     def api_request(method, *params)
@@ -125,8 +152,8 @@ module CGRateS
       api_request(method, { "TPid" => tp_id, "ID" => id }.merge(yield))
     end
 
-    def get_tp_resource(method, tp_id:, id:)
-      api_request(method, { "TPid" => tp_id, "ID" => id })
+    def get_tp_resource(method, tp_id:, id:, id_key: "ID")
+      api_request(method, { "TPid" => tp_id, id_key => id })
     end
 
     def default_http_client(host, username:, password:)
