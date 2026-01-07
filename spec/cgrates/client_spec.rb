@@ -112,6 +112,15 @@ module CGRateS
           )
         )
         expect(WebMock).to have_requested_api_method("APIerSv1.GetTPRate")
+
+        stub_api_request(result: "OK")
+        response = client.remove_tp_rate(
+          tp_id: "cgrates_client_test",
+          id: "Cambodia_Mobile_Rate"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveTPRate")
       end
     end
 
@@ -174,6 +183,15 @@ module CGRateS
           )
         )
         expect(WebMock).to have_requested_api_method("APIerSv1.GetTPDestinationRate")
+
+        stub_api_request(result: "OK")
+        response = client.remove_tp_destination_rate(
+          tp_id: "cgrates_client_test",
+          id: "Cambodia_Mobile_Destination_Rate"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveTPDestinationRate")
       end
     end
 

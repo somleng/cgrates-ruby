@@ -30,7 +30,7 @@ module CGRateS
     end
 
     def get_tp_destination(**)
-      get_tp_resource("APIerSv1.GetTPDestination", **)
+      tp_resource_request("APIerSv1.GetTPDestination", **)
     end
 
     def set_tp_rate(rate_slots:, **)
@@ -50,7 +50,11 @@ module CGRateS
     end
 
     def get_tp_rate(**)
-      get_tp_resource("APIerSv1.GetTPRate", **)
+      tp_resource_request("APIerSv1.GetTPRate", **)
+    end
+
+    def remove_tp_rate(**)
+      tp_resource_request("APIerSv1.RemoveTPRate", **)
     end
 
     def set_tp_destination_rate(destination_rates:, **)
@@ -71,7 +75,11 @@ module CGRateS
     end
 
     def get_tp_destination_rate(**)
-      get_tp_resource("APIerSv1.GetTPDestinationRate", **)
+      tp_resource_request("APIerSv1.GetTPDestinationRate", **)
+    end
+
+    def remove_tp_destination_rate(**)
+      tp_resource_request("APIerSv1.RemoveTPDestinationRate", **)
     end
 
     def set_tp_rating_plan(rating_plan_bindings:, **)
@@ -89,7 +97,7 @@ module CGRateS
     end
 
     def get_tp_rating_plan(**)
-      get_tp_resource("APIerSv1.GetTPRatingPlan", **)
+      tp_resource_request("APIerSv1.GetTPRatingPlan", **)
     end
 
     def set_tp_rating_profile(rating_plan_activations:, load_id:, category:, subject:, tenant: nil, **)
@@ -111,7 +119,7 @@ module CGRateS
     end
 
     def get_tp_rating_profile(tp_id:, load_id:, tenant:, category:, subject:)
-      get_tp_resource(
+      tp_resource_request(
         "APIerSv1.GetTPRatingProfile",
         tp_id:,
         id: [ load_id, tenant, category, subject ].join(":"),
@@ -152,7 +160,7 @@ module CGRateS
       api_request(method, { "TPid" => tp_id, "ID" => id }.merge(yield))
     end
 
-    def get_tp_resource(method, tp_id:, id:, id_key: "ID")
+    def tp_resource_request(method, tp_id:, id:, id_key: "ID")
       api_request(method, { "TPid" => tp_id, id_key => id })
     end
 
