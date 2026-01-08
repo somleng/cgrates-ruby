@@ -328,7 +328,7 @@ module CGRateS
         client = build_client
 
         stub_api_request(result: "OK")
-        response = client.set_account(account_id: "sample-account-sid", tenant: "cgrates.org")
+        response = client.set_account(account: "sample-account-sid", tenant: "cgrates.org")
 
         expect(response).to have_attributes(result: "OK")
         expect(WebMock).to have_requested_api_method("APIerSv2.SetAccount")
@@ -347,7 +347,7 @@ module CGRateS
 
         response = client.get_account(
           tenant: "cgrates.org",
-          account_id: "sample-account-sid"
+          account: "sample-account-sid"
         )
 
         expect(response).to have_attributes(
@@ -359,7 +359,7 @@ module CGRateS
 
         stub_api_request(result: "OK")
         response = client.remove_account(
-          account_id: "sample-account-sid",
+          account: "sample-account-sid",
           tenant: "cgrates.org"
         )
 

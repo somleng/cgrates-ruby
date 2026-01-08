@@ -131,34 +131,34 @@ module CGRateS
       )
     end
 
-    def set_account(account_id:, tenant: nil, **)
+    def set_account(account:, tenant: nil, **)
       api_request(
         "APIerSv2.SetAccount",
         {
           "Tenant" => tenant,
-          "Account" => account_id,
+          "Account" => account,
           **
         }
       )
     end
 
-    def get_account(account_id:, tenant: nil, **)
+    def get_account(account:, tenant: nil, **)
       api_request(
         "APIerSv2.GetAccount",
         {
           "Tenant" => tenant,
-          "Account" => account_id,
+          "Account" => account,
           **
         }
       )
     end
 
-    def remove_account(account_id:, tenant: nil, **)
+    def remove_account(account:, tenant: nil, **)
       api_request(
         "APIerSv1.RemoveAccount",
         {
           "Tenant" => tenant,
-          "Account" => account_id,
+          "Account" => account,
           **
         }
       )
