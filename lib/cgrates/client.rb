@@ -100,6 +100,10 @@ module CGRateS
       tp_resource_request("APIerSv1.GetTPRatingPlan", **)
     end
 
+    def remove_tp_rating_plan(**)
+      tp_resource_request("APIerSv1.RemoveTPRatingPlan", **)
+    end
+
     def set_tp_rating_profile(rating_plan_activations:, load_id:, category:, subject:, tenant: nil, **)
       set_tp_resource("APIerSv1.SetTPRatingProfile", **) do
         {

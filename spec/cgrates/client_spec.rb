@@ -244,6 +244,15 @@ module CGRateS
           )
         )
         expect(WebMock).to have_requested_api_method("APIerSv1.GetTPRatingPlan")
+
+        stub_api_request(result: "OK")
+        response = client.remove_tp_rating_plan(
+          tp_id: "cgrates_client_test",
+          id: "Test_Rating_Plan"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveTPRatingPlan")
       end
     end
 
