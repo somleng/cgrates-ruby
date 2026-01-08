@@ -323,6 +323,50 @@ module CGRateS
       end
     end
 
+    describe "#set_account" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.set_account(account_id: "sample-account-sid", tenant: "cgrates.org")
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv2.SetAccount")
+
+        stub_api_request(
+          result: {
+            "ID" => "cgrates.org:sample-account-sid",
+            "BalanceMap" => nil,
+            "UnitCounters" => nil,
+            "ActionTriggers" => nil,
+            "AllowNegative" => false,
+            "Disabled" => false,
+            "UpdateTime" => "2026-01-08T11:49:44.172931119Z"
+          }
+        )
+
+        response = client.get_account(
+          tenant: "cgrates.org",
+          account_id: "sample-account-sid"
+        )
+
+        expect(response).to have_attributes(
+          result: hash_including(
+            "ID" => "cgrates.org:sample-account-sid",
+          )
+        )
+        expect(WebMock).to have_requested_api_method("APIerSv2.GetAccount")
+
+        stub_api_request(result: "OK")
+        response = client.remove_account(
+          account_id: "sample-account-sid",
+          tenant: "cgrates.org"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveAccount")
+      end
+    end
 
     it "handles invalid http responses" do
       client = build_client

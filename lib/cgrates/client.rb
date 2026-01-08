@@ -105,7 +105,7 @@ module CGRateS
     end
 
     def set_tp_rating_profile(rating_plan_activations:, load_id:, category:, subject:, tenant: nil, **)
-      set_tp_resource("APIerSv1.SetTPRatingProfile", **) do
+      set_tp_resource("APIerSv1.SetTPRatingProfile", id: nil, **) do
         {
           "RatingPlanActivations" => rating_plan_activations.map do
             {
@@ -128,6 +128,39 @@ module CGRateS
         tp_id:,
         id: [ load_id, tenant, category, subject ].join(":"),
         id_key: "RatingProfileId"
+      )
+    end
+
+    def set_account(account_id:, tenant: nil, **)
+      api_request(
+        "APIerSv2.SetAccount",
+        {
+          "Tenant" => tenant,
+          "Account" => account_id,
+          **
+        }
+      )
+    end
+
+    def get_account(account_id:, tenant: nil, **)
+      api_request(
+        "APIerSv2.GetAccount",
+        {
+          "Tenant" => tenant,
+          "Account" => account_id,
+          **
+        }
+      )
+    end
+
+    def remove_account(account_id:, tenant: nil, **)
+      api_request(
+        "APIerSv1.RemoveAccount",
+        {
+          "Tenant" => tenant,
+          "Account" => account_id,
+          **
+        }
       )
     end
 
