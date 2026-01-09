@@ -131,6 +131,15 @@ module CGRateS
       )
     end
 
+    def remove_tp_rating_profile(tp_id:, load_id:, tenant:, category:, subject:)
+      tp_resource_request(
+        "APIerSv1.RemoveTPRatingProfile",
+        tp_id:,
+        id: [ load_id, tenant, category, subject ].join(":"),
+        id_key: "RatingProfileId"
+      )
+    end
+
     def set_account(account:, tenant: nil, **)
       api_request(
         "APIerSv2.SetAccount",

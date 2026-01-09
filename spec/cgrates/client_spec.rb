@@ -320,6 +320,18 @@ module CGRateS
           )
         )
         expect(WebMock).to have_requested_api_method("APIerSv1.GetTPRatingProfile")
+
+        stub_api_request(result: "OK")
+        response = client.remove_tp_rating_profile(
+          tp_id: "cgrates_client_test",
+          load_id: "TEST",
+          tenant: "cgrates.org",
+          category: "call",
+          subject: "my-account"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveTPRatingProfile")
       end
     end
 
