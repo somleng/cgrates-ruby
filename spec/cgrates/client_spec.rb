@@ -380,6 +380,18 @@ module CGRateS
       end
     end
 
+    describe "#load_tariff_plan_from_stor_db" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.load_tariff_plan_from_stor_db(tp_id: "cgrates_client_test")
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.LoadTariffPlanFromStorDb")
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)

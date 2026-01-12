@@ -173,6 +173,16 @@ module CGRateS
       )
     end
 
+    def load_tariff_plan_from_stor_db(tp_id:, dry_run: false, validate: true, **)
+      api_request(
+        "APIerSv1.LoadTariffPlanFromStorDb",
+        "TPid" => tp_id,
+        "DryRun" => dry_run,
+        "Validate" => validate,
+        **
+      )
+    end
+
     private
 
     def api_request(method, *params)
