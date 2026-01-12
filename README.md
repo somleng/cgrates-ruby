@@ -71,7 +71,6 @@ client.get_tp_rating_plan(tp_id: "cgrates_client_test", id: "Test_Rating_Plan")
 
 client.set_tp_rating_profile(
   tp_id: "cgrates_client_test",
-  id: "Test_Rating_Profile",
   load_id: "TEST",
   category: "call",
   tenant: "cgrates.org",

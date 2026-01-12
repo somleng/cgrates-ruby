@@ -112,6 +112,15 @@ module CGRateS
           )
         )
         expect(WebMock).to have_requested_api_method("APIerSv1.GetTPRate")
+
+        stub_api_request(result: "OK")
+        response = client.remove_tp_rate(
+          tp_id: "cgrates_client_test",
+          id: "Cambodia_Mobile_Rate"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveTPRate")
       end
     end
 
@@ -174,6 +183,15 @@ module CGRateS
           )
         )
         expect(WebMock).to have_requested_api_method("APIerSv1.GetTPDestinationRate")
+
+        stub_api_request(result: "OK")
+        response = client.remove_tp_destination_rate(
+          tp_id: "cgrates_client_test",
+          id: "Cambodia_Mobile_Destination_Rate"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveTPDestinationRate")
       end
     end
 
@@ -226,6 +244,15 @@ module CGRateS
           )
         )
         expect(WebMock).to have_requested_api_method("APIerSv1.GetTPRatingPlan")
+
+        stub_api_request(result: "OK")
+        response = client.remove_tp_rating_plan(
+          tp_id: "cgrates_client_test",
+          id: "Test_Rating_Plan"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveTPRatingPlan")
       end
     end
 
@@ -293,9 +320,77 @@ module CGRateS
           )
         )
         expect(WebMock).to have_requested_api_method("APIerSv1.GetTPRatingProfile")
+
+        stub_api_request(result: "OK")
+        response = client.remove_tp_rating_profile(
+          tp_id: "cgrates_client_test",
+          load_id: "TEST",
+          tenant: "cgrates.org",
+          category: "call",
+          subject: "my-account"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveTPRatingProfile")
       end
     end
 
+    describe "#set_account" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.set_account(account: "sample-account-sid", tenant: "cgrates.org")
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv2.SetAccount")
+
+        stub_api_request(
+          result: {
+            "ID" => "cgrates.org:sample-account-sid",
+            "BalanceMap" => nil,
+            "UnitCounters" => nil,
+            "ActionTriggers" => nil,
+            "AllowNegative" => false,
+            "Disabled" => false,
+            "UpdateTime" => "2026-01-08T11:49:44.172931119Z"
+          }
+        )
+
+        response = client.get_account(
+          tenant: "cgrates.org",
+          account: "sample-account-sid"
+        )
+
+        expect(response).to have_attributes(
+          result: hash_including(
+            "ID" => "cgrates.org:sample-account-sid",
+          )
+        )
+        expect(WebMock).to have_requested_api_method("APIerSv2.GetAccount")
+
+        stub_api_request(result: "OK")
+        response = client.remove_account(
+          account: "sample-account-sid",
+          tenant: "cgrates.org"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveAccount")
+      end
+    end
+
+    describe "#load_tariff_plan_from_stor_db" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.load_tariff_plan_from_stor_db(tp_id: "cgrates_client_test")
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.LoadTariffPlanFromStorDb")
+      end
+    end
 
     it "handles invalid http responses" do
       client = build_client
