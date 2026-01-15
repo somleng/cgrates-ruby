@@ -183,7 +183,43 @@ module CGRateS
       )
     end
 
+    def add_balance(**)
+      balance_request("APIerSv1.AddBalance", **)
+    end
+
+    def debit_balance(**)
+      balance_request("APIerSv1.DebitBalance", **)
+    end
+
     private
+
+    def balance_request(method, account:, tenant:, balance_type:, value:, balance:, overwrite: false, action_extra_data: {}, cdrlog: false, **)
+      api_request(
+        method,
+        {
+          "Account" => account,
+          "Tenant" => tenant,
+          "BalanceType" => balance_type,
+          "Value" => value,
+          "Balance" => {
+            "ID" => balance[:id],
+            "ExpiryTime" => balance.fetch(:expiry_time, "*unlimited"),
+            "RatingSubject" => balance[:rating_subject],
+            "Categories" => balance[:categories],
+            "DestinationIDs" => balance.fetch(:destination_ids, "*any"),
+            "TimingIDs" => balance[:timing_ids],
+            "Weight" => balance.fetch(:weight, 10),
+            "SharedGroups" => balance[:shared_groups],
+            "Blocker" => balance.fetch(:blocker, false),
+            "Disabled" => balance.fetch(:disabled, false)
+          },
+          "ActionExtraData" => action_extra_data,
+          "Overwrite" => overwrite,
+          "Cdrlog" => cdrlog,
+          **
+        }
+      )
+    end
 
     def api_request(method, *params)
       response = http_client.post(

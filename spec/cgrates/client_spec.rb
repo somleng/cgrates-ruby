@@ -392,6 +392,30 @@ module CGRateS
       end
     end
 
+    describe "#add_balance" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.add_balance(account: "sample-account-sid", tenant: "cgrates.org", balance_type: "credit", value: 100, balance: { uuid: "123", id: "456" })
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.AddBalance")
+      end
+    end
+
+    describe "#debit_balance" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.debit_balance(account: "sample-account-sid", tenant: "cgrates.org", balance_type: "credit", value: 100, balance: { uuid: "123", id: "456" })
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.DebitBalance")
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)
