@@ -416,6 +416,23 @@ module CGRateS
       end
     end
 
+    describe "#get_cdrs" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: [])
+        response = client.get_cdrs(
+          tenants: [ "cgrates.org" ],
+          order_by: "OrderID",
+          extra_args: { "OrderIDStart" => 1 },
+          limit: 2
+        )
+
+        expect(response).to have_attributes(result: a_kind_of(Array))
+        expect(WebMock).to have_requested_api_method("APIerSv2.GetCDRs")
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)
