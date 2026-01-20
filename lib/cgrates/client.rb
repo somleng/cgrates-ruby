@@ -3,7 +3,14 @@ require "json"
 
 module CGRateS
   class Client
-    class APIError < StandardError; end
+    class APIError < StandardError
+      attr_reader :response
+
+      def initialize(message, response:)
+        super(message)
+        @response = response
+      end
+    end
 
     attr_reader :host, :http_client, :jsonrpc_endpoint
 
@@ -250,7 +257,12 @@ module CGRateS
       end
 
       if error_message
-        raise(APIError, "Invalid response from CGRateS API: #{error_message}")
+        raise(
+          APIError.new(
+            "Invalid response from CGRateS API: #{error_message}",
+            response: response.body
+          )
+        )
       end
 
       Response.new(
