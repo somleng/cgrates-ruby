@@ -12,6 +12,8 @@ module CGRateS
       end
     end
 
+    class NotFoundError < APIError; end
+
     attr_reader :host, :http_client, :jsonrpc_endpoint
 
     def initialize(**options)
@@ -258,7 +260,7 @@ module CGRateS
 
       if error_message
         raise(
-          APIError.new(
+          error_class_from(error_message).new(
             "Invalid response from CGRateS API: #{error_message}",
             response: response.body
           )
@@ -269,6 +271,15 @@ module CGRateS
         id: response.body.fetch("id"),
         result: response.body.fetch("result")
       )
+    end
+
+    def error_class_from(error_message)
+      case error_message
+      when "NOT_FOUND"
+        NotFoundError
+      else
+        APIError
+      end
     end
 
     def set_tp_resource(method, tp_id:, id:, &)

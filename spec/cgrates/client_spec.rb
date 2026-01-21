@@ -445,7 +445,7 @@ module CGRateS
       stub_api_request(result: nil, error: "NOT_FOUND")
 
       expect { client.get_tp_destination(tp_id: "non_existent", id: "non_existent") }.to raise_error do |error|
-        expect(error).to be_a(CGRateS::Client::APIError)
+        expect(error).to be_a(CGRateS::Client::NotFoundError)
         expect(error.response).to include(
           "error" => "NOT_FOUND"
         )
