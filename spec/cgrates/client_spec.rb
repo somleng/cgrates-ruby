@@ -433,6 +433,29 @@ module CGRateS
       end
     end
 
+    describe "#process_external_cdr" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.process_external_cdr(
+          account: "sample-account-sid",
+          tenant: "cgrates.org",
+          category: "call",
+          request_type: "*prepaid",
+          tor: "*message",
+          destination: "85510",
+          answer_time: "2025-12-03T19:55:23+07:00",
+          setup_time: "2025-12-03T19:55:23+07:00",
+          usage: "100",
+          origin_id: "123"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("CDRsV1.ProcessExternalCDR")
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)

@@ -211,6 +211,24 @@ module CGRateS
       )
     end
 
+    def process_external_cdr(category:, request_type:, tor:, tenant:, account:, subject: nil, destination:, answer_time:, setup_time:, usage:, origin_id:, **)
+      api_request(
+        "CDRsV1.ProcessExternalCDR",
+        "Category" => category,
+        "RequestType" => request_type,
+        "ToR" => tor,
+        "Tenant" => tenant,
+        "Account" => account,
+        "Subject" => subject,
+        "Destination" => destination,
+        "AnswerTime" => answer_time,
+        "SetupTime" => setup_time,
+        "Usage" => usage,
+        "OriginId" => origin_id,
+        **
+      )
+    end
+
     private
 
     def balance_request(method, account:, tenant:, balance_type:, value:, balance:, overwrite: false, action_extra_data: {}, cdrlog: false, **)
