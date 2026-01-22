@@ -423,6 +423,8 @@ module CGRateS
         stub_api_request(result: [])
         response = client.get_cdrs(
           tenants: [ "cgrates.org" ],
+          not_costs: [ -1 ],
+          origin_ids: [ "origin-id-1" ],
           order_by: "OrderID",
           extra_args: { "OrderIDStart" => 1 },
           limit: 2
