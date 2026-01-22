@@ -448,7 +448,7 @@ module CGRateS
           answer_time: "2025-12-03T19:55:23+07:00",
           setup_time: "2025-12-03T19:55:23+07:00",
           usage: "100",
-          origin_id: "123"
+          origin_id: SecureRandom.uuid
         )
 
         expect(response).to have_attributes(result: "OK")

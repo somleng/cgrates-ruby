@@ -200,13 +200,14 @@ module CGRateS
       balance_request("APIerSv1.DebitBalance", **)
     end
 
-    def get_cdrs(tenants: [], order_by: "OrderID", extra_args: {}, limit: nil, **)
+    def get_cdrs(tenants: [], order_by: "OrderID", extra_args: {}, limit: nil, origin_ids: [], **)
       api_request(
         "APIerSv2.GetCDRs",
         "Tenants" => tenants,
         "OrderBy" => order_by,
         "ExtraArgs" => extra_args,
         "Limit" => limit,
+        "OriginIDs" => origin_ids,
         **
       )
     end
