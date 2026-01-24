@@ -231,6 +231,33 @@ module CGRateS
       )
     end
 
+    def set_charger_profile(id:, tenant:, **)
+      api_request(
+        "APIerSv1.SetChargerProfile",
+        "ID" => id,
+        "Tenant" => tenant,
+        **
+      )
+    end
+
+    def get_charger_profile(id:, tenant:, **)
+        api_request(
+        "APIerSv1.GetChargerProfile",
+        "ID" => id,
+        "Tenant" => tenant,
+        **
+      )
+    end
+
+    def remove_charger_profile(id:, tenant:, **)
+      api_request(
+        "APIerSv1.RemoveChargerProfile",
+        "ID" => id,
+        "Tenant" => tenant,
+        **
+      )
+    end
+
     private
 
     def balance_request(method, account:, tenant:, balance_type:, value:, balance:, overwrite: false, action_extra_data: {}, cdrlog: false, **)

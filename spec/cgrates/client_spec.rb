@@ -19,6 +19,53 @@ module CGRateS
       end
     end
 
+    describe "#set_charger_profile" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+
+        response = client.set_charger_profile(
+          id: "Test_Charger_Profile",
+          tenant: "cgrates.org"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.SetChargerProfile")
+
+        stub_api_request(
+          result: {
+            "ID" => "Test_Charger_Profile",
+            "Tenant" => "cgrates.org"
+          }
+        )
+
+        response = client.get_charger_profile(
+          id: "Test_Charger_Profile",
+          tenant: "cgrates.org"
+        )
+
+        expect(response).to have_attributes(
+          result: hash_including(
+            "Tenant" => "cgrates.org",
+            "ID" => "Test_Charger_Profile"
+          )
+        )
+
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetChargerProfile")
+
+        stub_api_request(result: "OK")
+
+        response = client.remove_charger_profile(
+          id: "Test_Charger_Profile",
+          tenant: "cgrates.org"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveChargerProfile")
+      end
+    end
+
     describe "#set_tp_destination" do
       it "executes the request" do
         client = build_client
