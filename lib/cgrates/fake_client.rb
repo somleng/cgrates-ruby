@@ -25,8 +25,10 @@ module CGRateS
       )
     end
 
-    def method_missing(...)
-      build_response(result: "OK")
+    def method_missing(method_name, *)
+      return build_response(result: "OK")  if Client.instance_methods(false).include?(method_name.to_sym)
+
+      super
     end
 
     private
