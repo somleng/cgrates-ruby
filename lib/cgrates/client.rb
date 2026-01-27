@@ -13,6 +13,7 @@ module CGRateS
     end
 
     class NotFoundError < APIError; end
+    class MaxUsageExceededError < APIError; end
 
     attr_reader :host, :http_client, :jsonrpc_endpoint
 
@@ -336,6 +337,8 @@ module CGRateS
       case error_message
       when "NOT_FOUND"
         NotFoundError
+      when /MAX_USAGE_EXCEEDED/
+        MaxUsageExceededError
       else
         APIError
       end

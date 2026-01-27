@@ -523,6 +523,26 @@ module CGRateS
         expect(response).to have_attributes(result: a_kind_of(Hash))
         expect(WebMock).to have_requested_api_method("APIerSv1.GetCost")
       end
+
+      it "handles error responses from the API" do
+        client = build_client
+        stub_api_request(result: nil, error: "SERVER_ERROR: MAX_USAGE_EXCEEDED")
+
+        expect {
+          client.get_cost(
+            tenant: "cgrates.org",
+            subject: "sample-account-sid",
+            category: "call",
+            destination: "85510",
+            usage: "60s"
+          )
+        }.to raise_error do |error|
+          expect(error).to be_a(CGRateS::Client::MaxUsageExceededError)
+          expect(error.response).to include(
+            "error" => "SERVER_ERROR: MAX_USAGE_EXCEEDED"
+          )
+        end
+      end
     end
 
     it "handles invalid http responses" do
