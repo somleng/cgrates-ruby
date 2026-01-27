@@ -506,6 +506,25 @@ module CGRateS
       end
     end
 
+    describe "#get_cost" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: {})
+        response = client.get_cost(
+          tenant: "cgrates.org",
+          account: "sample-account-sid",
+          subject: "my-account",
+          category: "call",
+          destination: "85510",
+          usage: "100"
+        )
+
+        expect(response).to have_attributes(result: a_kind_of(Hash))
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetCost")
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)

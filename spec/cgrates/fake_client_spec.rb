@@ -47,6 +47,27 @@ module CGRateS
       end
     end
 
+    describe "#get_cost" do
+      it "returns a fake response" do
+        client = build_client
+
+        response = client.get_cost(
+          tenant: "cgrates.org",
+          subject: "my-account",
+          category: "call",
+          destination: "85510",
+          usage: "100"
+        )
+
+        expect(response).to have_attributes(
+          result: hash_including(
+            "Usage" => a_kind_of(Integer),
+            "Cost" => a_kind_of(Integer),
+          )
+        )
+      end
+    end
+
     def build_client(**)
       FakeClient.new(**)
     end

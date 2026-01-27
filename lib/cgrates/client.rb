@@ -258,6 +258,18 @@ module CGRateS
       )
     end
 
+    def get_cost(tenant:, subject:, category:, destination:, usage:, **)
+      api_request(
+        "APIerSv1.GetCost",
+        "Tenant" => tenant,
+        "Subject" => subject,
+        "Category" => category,
+        "Destination" => destination,
+        "Usage" => usage,
+        **
+      )
+    end
+
     private
 
     def balance_request(method, account:, tenant:, balance_type:, value:, balance:, overwrite: false, action_extra_data: {}, cdrlog: false, **)
