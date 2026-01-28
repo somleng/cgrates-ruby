@@ -104,6 +104,12 @@ module CGRateS
       )
     end
 
+    def get_max_session_time(...)
+      build_response(
+        result: 100
+      )
+    end
+
     def method_missing(method_name, *)
       return build_response(result: "OK")  if Client.instance_methods(false).include?(method_name.to_sym)
 

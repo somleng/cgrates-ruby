@@ -271,6 +271,19 @@ module CGRateS
       )
     end
 
+    def get_max_session_time(tenant:, account:, category:, destination:, time_start:, time_end:, **)
+      api_request(
+        "Responder.GetMaxSessionTime",
+        "Tenant" => tenant,
+        "Account" => account,
+        "Category" => category,
+        "Destination" => destination,
+        "TimeStart" => time_start,
+        "TimeEnd" => time_end,
+        **
+      )
+    end
+
     private
 
     def balance_request(method, account:, tenant:, balance_type:, value:, balance:, overwrite: false, action_extra_data: {}, cdrlog: false, **)

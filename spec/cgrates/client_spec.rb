@@ -545,6 +545,25 @@ module CGRateS
       end
     end
 
+    describe "#get_max_session_time" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: 100)
+        response = client.get_max_session_time(
+          tenant: "cgrates.org",
+          account: "sample-account-sid",
+          category: "call",
+          destination: "85510",
+          time_start: "0001-01-01T00:00:00Z",
+          time_end: "0001-01-01T03:00:01Z"
+        )
+
+        expect(response).to have_attributes(result: a_kind_of(Integer))
+        expect(WebMock).to have_requested_api_method("Responder.GetMaxSessionTime")
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)

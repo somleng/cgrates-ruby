@@ -68,6 +68,25 @@ module CGRateS
       end
     end
 
+    describe "#get_max_session_time" do
+      it "returns a fake response" do
+        client = build_client
+
+        response = client.get_max_session_time(
+          tenant: "cgrates.org",
+          account: "sample-account-sid",
+          category: "call",
+          destination: "85510",
+          time_start: "0001-01-01T00:00:00Z",
+          time_end: "0001-01-01T03:00:01Z"
+        )
+
+        expect(response).to have_attributes(
+          result: a_kind_of(Integer)
+        )
+      end
+    end
+
     def build_client(**)
       FakeClient.new(**)
     end
