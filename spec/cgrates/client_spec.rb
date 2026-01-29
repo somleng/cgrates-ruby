@@ -1,3 +1,4 @@
+require "spec_helper"
 require "base64"
 
 module CGRateS
@@ -16,6 +17,53 @@ module CGRateS
             "Authorization" => "Basic #{Base64.strict_encode64("username:password")}"
           }
         )
+      end
+    end
+
+    describe "#set_charger_profile" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+
+        response = client.set_charger_profile(
+          id: "Test_Charger_Profile",
+          tenant: "cgrates.org"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.SetChargerProfile")
+
+        stub_api_request(
+          result: {
+            "ID" => "Test_Charger_Profile",
+            "Tenant" => "cgrates.org"
+          }
+        )
+
+        response = client.get_charger_profile(
+          id: "Test_Charger_Profile",
+          tenant: "cgrates.org"
+        )
+
+        expect(response).to have_attributes(
+          result: hash_including(
+            "Tenant" => "cgrates.org",
+            "ID" => "Test_Charger_Profile"
+          )
+        )
+
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetChargerProfile")
+
+        stub_api_request(result: "OK")
+
+        response = client.remove_charger_profile(
+          id: "Test_Charger_Profile",
+          tenant: "cgrates.org"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveChargerProfile")
       end
     end
 
@@ -392,6 +440,141 @@ module CGRateS
       end
     end
 
+    describe "#add_balance" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.add_balance(account: "sample-account-sid", tenant: "cgrates.org", balance_type: "credit", value: 100, balance: { uuid: "123", id: "456" })
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.AddBalance")
+      end
+    end
+
+    describe "#debit_balance" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.debit_balance(account: "sample-account-sid", tenant: "cgrates.org", balance_type: "credit", value: 100, balance: { uuid: "123", id: "456" })
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.DebitBalance")
+      end
+    end
+
+    describe "#get_cdrs" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: [])
+        response = client.get_cdrs(
+          tenants: [ "cgrates.org" ],
+          not_costs: [ -1 ],
+          origin_ids: [ "origin-id-1" ],
+          order_by: "OrderID",
+          extra_args: { "OrderIDStart" => 1 },
+          limit: 2
+        )
+
+        expect(response).to have_attributes(result: a_kind_of(Array))
+        expect(WebMock).to have_requested_api_method("APIerSv2.GetCDRs")
+      end
+    end
+
+    describe "#process_external_cdr" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: "OK")
+        response = client.process_external_cdr(
+          account: "sample-account-sid",
+          tenant: "cgrates.org",
+          category: "call",
+          request_type: "*prepaid",
+          tor: "*message",
+          destination: "85510",
+          answer_time: "2025-12-03T19:55:23+07:00",
+          setup_time: "2025-12-03T19:55:23+07:00",
+          usage: "100",
+          origin_id: SecureRandom.uuid
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("CDRsV1.ProcessExternalCDR")
+      end
+    end
+
+    describe "#get_cost" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: {})
+        response = client.get_cost(
+          tenant: "cgrates.org",
+          account: "sample-account-sid",
+          subject: "my-account",
+          category: "call",
+          destination: "85510",
+          usage: "100"
+        )
+
+        expect(response).to have_attributes(result: a_kind_of(Hash))
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetCost")
+      end
+
+      it "handles error responses from the API" do
+        client = build_client
+        stub_api_request(result: nil, error: "SERVER_ERROR: MAX_USAGE_EXCEEDED")
+
+        expect {
+          client.get_cost(
+            tenant: "cgrates.org",
+            subject: "sample-account-sid",
+            category: "call",
+            destination: "85510",
+            usage: "60s"
+          )
+        }.to raise_error do |error|
+          expect(error).to be_a(CGRateS::Client::MaxUsageExceededError)
+          expect(error.response).to include(
+            "error" => "SERVER_ERROR: MAX_USAGE_EXCEEDED"
+          )
+        end
+      end
+    end
+
+    describe "#get_max_session_time" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: 100)
+        response = client.get_max_session_time(
+          tenant: "cgrates.org",
+          account: "sample-account-sid",
+          category: "call",
+          destination: "85510",
+        )
+
+        expect(response).to have_attributes(result: a_kind_of(Integer))
+        expect(WebMock).to have_requested_api_method_with("Responder.GetMaxSessionTime") { |request_body|
+          expect(request_body.params).to include(
+            "Tenant" => "cgrates.org",
+            "Account" => "sample-account-sid",
+            "Category" => "call",
+            "Destination" => "85510",
+            "TimeStart" => a_kind_of(String),
+            "TimeEnd" => a_kind_of(String)
+          )
+          expect(
+            Time.parse(request_body.params.fetch("TimeEnd")) -
+            Time.parse(request_body.params.fetch("TimeStart"))
+          ).to eq(3 * 60 * 60)
+        }
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)
@@ -403,9 +586,12 @@ module CGRateS
       client = build_client
       stub_api_request(result: nil, error: "NOT_FOUND")
 
-      expect { client.get_tp_destination(tp_id: "non_existent", id: "non_existent") }.to raise_error(
-        CGRateS::Client::APIError, /NOT_FOUND/
-      )
+      expect { client.get_tp_destination(tp_id: "non_existent", id: "non_existent") }.to raise_error do |error|
+        expect(error).to be_a(CGRateS::Client::NotFoundError)
+        expect(error.response).to include(
+          "error" => "NOT_FOUND"
+        )
+      end
     end
 
     def build_client(**options)
@@ -429,11 +615,25 @@ module CGRateS
       }
     end
 
-    def have_requested_api_method(method, **options)
+    def have_requested_api_method(method, **options, &)
       host = options.fetch(:host, "http://localhost:2080")
       path = options.fetch(:path, "jsonrpc")
       have_requested(:post, "#{host}/#{path}").with(
-        body: hash_including("method" => method)
+        body: hash_including("method" => method), &
+      )
+    end
+
+    def have_requested_api_method_with(*, **)
+      have_requested_api_method(*, **) { |request| yield(parse_request(request)) }
+    end
+
+    def parse_request(raw_request)
+      json_request = JSON.parse(raw_request.body)
+
+      Data.define(:id, :method, :params).new(
+        id: json_request.fetch("id"),
+        method: json_request.fetch("method"),
+        params: json_request.dig("params", 0)
       )
     end
 
