@@ -554,7 +554,8 @@ module CGRateS
           tenant: "cgrates.org",
           account: "sample-account-sid",
           category: "call",
-          destination: "85510"
+          destination: "85510",
+          max_duration_seconds: 60
         )
 
         expect(response).to have_attributes(result: a_kind_of(Integer))
@@ -570,7 +571,7 @@ module CGRateS
           expect(
             Time.parse(request_body.params.fetch("TimeEnd")) -
             Time.parse(request_body.params.fetch("TimeStart"))
-          ).to eq(3 * 60 * 60)
+          ).to eq(60)
         }
       end
     end
