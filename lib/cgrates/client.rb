@@ -273,7 +273,7 @@ module CGRateS
 
     def get_max_session_time(tenant:, account:, category:, destination:, time_start: nil, time_end: nil, duration_seconds: nil, **)
       duration_seconds ||= 3 * 60 * 60
-      time_start ||= Time.now.utc
+      time_start ||= Time.now
       time_end ||= time_start + duration_seconds
 
       api_request(
@@ -282,8 +282,8 @@ module CGRateS
         "Account" => account,
         "Category" => category,
         "Destination" => destination,
-        "TimeStart" => time_start.iso8601,
-        "TimeEnd" => time_end.iso8601,
+        "TimeStart" => time_start.utc.iso8601,
+        "TimeEnd" => time_end.utc.iso8601,
         **
       )
     end
