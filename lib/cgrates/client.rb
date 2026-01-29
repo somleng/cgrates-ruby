@@ -271,8 +271,8 @@ module CGRateS
       )
     end
 
-    def get_max_session_time(tenant:, account:, category:, destination:, time_start: nil, time_end: nil, max_duration_seconds: nil, **)
-      max_duration_seconds ||= 3 * 60 * 60
+    def get_max_session_time(tenant:, account:, category:, destination:, time_start: nil, time_end: nil, **)
+      max_duration_seconds = 3 * 60 * 60
       time_start ||= Time.now
       time_end ||= time_start + max_duration_seconds
 
