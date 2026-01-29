@@ -554,13 +554,24 @@ module CGRateS
           tenant: "cgrates.org",
           account: "sample-account-sid",
           category: "call",
-          destination: "85510",
-          time_start: "0001-01-01T00:00:00Z",
-          time_end: "0001-01-01T03:00:01Z"
+          destination: "85510"
         )
 
         expect(response).to have_attributes(result: a_kind_of(Integer))
-        expect(WebMock).to have_requested_api_method("Responder.GetMaxSessionTime")
+        expect(WebMock).to have_requested_api_method_with("Responder.GetMaxSessionTime") { |request_body|
+          expect(request_body.params).to include(
+            "Tenant" => "cgrates.org",
+            "Account" => "sample-account-sid",
+            "Category" => "call",
+            "Destination" => "85510",
+            "TimeStart" => a_kind_of(String),
+            "TimeEnd" => a_kind_of(String)
+          )
+          expect(
+            Time.parse(request_body.params.fetch("TimeEnd")) -
+            Time.parse(request_body.params.fetch("TimeStart"))
+          ).to eq(3 * 60 * 60)
+        }
       end
     end
 
@@ -604,11 +615,25 @@ module CGRateS
       }
     end
 
-    def have_requested_api_method(method, **options)
+    def have_requested_api_method(method, **options, &)
       host = options.fetch(:host, "http://localhost:2080")
       path = options.fetch(:path, "jsonrpc")
       have_requested(:post, "#{host}/#{path}").with(
-        body: hash_including("method" => method)
+        body: hash_including("method" => method), &
+      )
+    end
+
+    def have_requested_api_method_with(*, **)
+      have_requested_api_method(*, **) { |request| yield(parse_request(request)) }
+    end
+
+    def parse_request(raw_request)
+      json_request = JSON.parse(raw_request.body)
+
+      Data.define(:id, :method, :params).new(
+        id: json_request.fetch("id"),
+        method: json_request.fetch("method"),
+        params: json_request.dig("params", 0)
       )
     end
 
