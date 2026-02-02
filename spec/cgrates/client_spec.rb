@@ -445,10 +445,12 @@ module CGRateS
         client = build_client
 
         stub_api_request(result: "OK")
-        response = client.add_balance(account: "sample-account-sid", tenant: "cgrates.org", balance_type: "credit", value: 100, balance: { uuid: "123", id: "456" })
+        response = client.add_balance(account: "sample-account-sid", tenant: "cgrates.org", balance_type: "credit", value: BigDecimal("100.0"), balance: { uuid: "123", id: "456" })
 
         expect(response).to have_attributes(result: "OK")
-        expect(WebMock).to have_requested_api_method("APIerSv1.AddBalance")
+        expect(WebMock).to have_requested_api_method_with("APIerSv1.AddBalance") { |request|
+          expect(request.params["Value"]).to eq(100.0)
+        }
       end
     end
 
