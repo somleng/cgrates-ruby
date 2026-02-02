@@ -575,6 +575,25 @@ module CGRateS
       end
     end
 
+    describe "#get_max_usage" do
+      it "executes the request" do
+        client = build_client
+
+        stub_api_request(result: 100)
+        response = client.get_max_usage(
+          tenant: "cgrates.org",
+          account: "sample-account-sid",
+          category: "outbound_messages",
+          destination: "85510",
+          tor: "*sms",
+          request_type: "*prepaid"
+        )
+
+        expect(response).to have_attributes(result: a_kind_of(Integer))
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetMaxUsage")
+      end
+    end
+
     it "handles invalid http responses" do
       client = build_client
       stub_api_request(status: 500)

@@ -87,6 +87,25 @@ module CGRateS
       end
     end
 
+    describe "#get_max_usage" do
+      it "returns a fake response" do
+        client = build_client
+
+        response = client.get_max_usage(
+          tenant: "cgrates.org",
+          account: "sample-account-sid",
+          category: "call",
+          destination: "85510",
+          tor: "*sms",
+          request_type: "*prepaid"
+        )
+
+        expect(response).to have_attributes(
+          result: a_kind_of(Integer)
+        )
+      end
+    end
+
     def build_client(**)
       FakeClient.new(**)
     end

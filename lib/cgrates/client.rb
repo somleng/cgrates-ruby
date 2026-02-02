@@ -271,7 +271,7 @@ module CGRateS
       )
     end
 
-    def get_max_session_time(tenant:, account:, category:, destination:, time_start: nil, time_end: nil, **)
+    def get_max_session_time(tenant:, account:, category:, destination:, time_start: nil, time_end: nil, tor: nil, **)
       max_duration_seconds = 3 * 60 * 60
       time_start ||= Time.now
       time_end ||= time_start + max_duration_seconds
@@ -284,6 +284,20 @@ module CGRateS
         "Destination" => destination,
         "TimeStart" => time_start.utc.iso8601,
         "TimeEnd" => time_end.utc.iso8601,
+        "ToR" => tor,
+        **
+      )
+    end
+
+    def get_max_usage(tenant:, account:, category:, destination:, request_type:, tor:, **)
+      api_request(
+        "APIerSv1.GetMaxUsage",
+        "Tenant" => tenant,
+        "Account" => account,
+        "RequestType" => request_type,
+        "Category" => category,
+        "Destination" => destination,
+        "ToR" => tor,
         **
       )
     end
