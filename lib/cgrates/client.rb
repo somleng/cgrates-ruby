@@ -297,7 +297,7 @@ module CGRateS
           "Account" => account,
           "Tenant" => tenant,
           "BalanceType" => balance_type,
-          "Value" => value,
+          "Value" => value.to_f,
           "Balance" => {
             "ID" => balance[:id],
             "ExpiryTime" => balance.fetch(:expiry_time, "*unlimited"),
