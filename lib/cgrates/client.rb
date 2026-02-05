@@ -150,7 +150,7 @@ module CGRateS
       )
     end
 
-    def set_rating_profile(rating_plan_activations:, category:, subject:, tenant: nil, **)
+    def set_rating_profile(rating_plan_activations:, category:, subject:, tenant: nil, overwrite: nil, **)
       api_request(
         "APIerSv1.SetRatingProfile",
         "RatingPlanActivations" => rating_plan_activations.map do
@@ -163,6 +163,7 @@ module CGRateS
         "Category" => category,
         "Subject" => subject,
         "Tenant" => tenant,
+        "Overwrite" => overwrite,
         **
       )
     end
