@@ -150,6 +150,43 @@ module CGRateS
       )
     end
 
+    def set_rating_profile(rating_plan_activations:, category:, subject:, tenant: nil, **)
+      api_request(
+        "APIerSv1.SetRatingProfile",
+        "RatingPlanActivations" => rating_plan_activations.map do
+          {
+            "ActivationTime" => it[:activation_time],
+            "FallbackSubjects" => it[:fallback_subjects],
+            "RatingPlanId" => it[:rating_plan_id]
+          }
+        end,
+        "Category" => category,
+        "Subject" => subject,
+        "Tenant" => tenant,
+        **
+      )
+    end
+
+    def get_rating_profile(tenant:, category:, subject:, **)
+      api_request(
+        "APIerSv1.GetRatingProfile",
+        "Tenant" => tenant,
+        "Category" => category,
+        "Subject" => subject,
+        **
+      )
+    end
+
+    def remove_rating_profile(tenant:, category:, subject:, **)
+      api_request(
+        "APIerSv1.RemoveRatingProfile",
+        "Tenant" => tenant,
+        "Category" => category,
+        "Subject" => subject,
+        **
+      )
+    end
+
     def set_account(account:, tenant: nil, **)
       api_request(
         "APIerSv2.SetAccount",

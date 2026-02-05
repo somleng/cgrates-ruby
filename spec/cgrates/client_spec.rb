@@ -383,6 +383,72 @@ module CGRateS
       end
     end
 
+    describe "#set_rating_profile" do
+      it "executes the request" do
+        client = build_client
+        set_tp_rating_plan(client, tp_id: "cgrates_client_test", id: "Test_Rating_Plan")
+
+        client.load_tariff_plan_from_stor_db(tp_id: "cgrates_client_test")
+
+        stub_api_request(result: "OK")
+        response = client.set_rating_profile(
+          id: "Test_Rating_Profile",
+          category: "call",
+          tenant: "cgrates.org",
+          subject: "my-account",
+          rating_plan_activations: [
+            {
+              activation_time: "2025-12-03T19:55:23+07:00",
+              rating_plan_id: "Test_Rating_Plan"
+            }
+          ]
+        )
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.SetRatingProfile")
+
+        stub_api_request(
+          result: {
+            "Id" => "*out:cgrates.org:call:my-account",
+            "RatingPlanActivations" => [
+              {
+                "ActivationTime" => "2025-12-03T19:55:23+07:00",
+                "RatingPlanId" => "Test_Rating_Plan"
+              }
+            ]
+          }
+        )
+
+        response = client.get_rating_profile(
+          tenant: "cgrates.org",
+          category: "call",
+          subject: "my-account"
+        )
+
+        expect(response).to have_attributes(
+          result: hash_including(
+            "Id" => "*out:cgrates.org:call:my-account",
+            "RatingPlanActivations" => include(
+              hash_including(
+                "ActivationTime" =>"2025-12-03T19:55:23+07:00",
+                "RatingPlanId" => "Test_Rating_Plan"
+              )
+            )
+          )
+        )
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetRatingProfile")
+
+        stub_api_request(result: "OK")
+        response = client.remove_rating_profile(
+          tenant: "cgrates.org",
+          category: "call",
+          subject: "my-account"
+        )
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveRatingProfile")
+      end
+    end
+
     describe "#set_account" do
       it "executes the request" do
         client = build_client
