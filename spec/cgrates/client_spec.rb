@@ -449,6 +449,34 @@ module CGRateS
       end
     end
 
+    describe "#remove_rating_plan" do
+      it "executes the request" do
+        client = build_client
+        set_tp_rating_plan(client, tp_id: "cgrates_client_test", id: "Test_Rating_Plan")
+        client.load_tariff_plan_from_stor_db(tp_id: "cgrates_client_test")
+
+        stub_api_request(
+          result: {
+            "Id" => "Test_Rating_Plan"
+          }
+        )
+        response = client.get_rating_plan("Test_Rating_Plan")
+        expect(response).to have_attributes(
+          result: hash_including(
+            "Id" => "Test_Rating_Plan"
+          )
+        )
+        expect(WebMock).to have_requested_api_method("APIerSv1.GetRatingPlan")
+
+        stub_api_request(result: "OK")
+
+        response = client.remove_rating_plan("Test_Rating_Plan")
+
+        expect(response).to have_attributes(result: "OK")
+        expect(WebMock).to have_requested_api_method("APIerSv1.RemoveRatingPlan")
+      end
+    end
+
     describe "#set_account" do
       it "executes the request" do
         client = build_client

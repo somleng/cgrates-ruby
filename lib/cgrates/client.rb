@@ -150,6 +150,14 @@ module CGRateS
       )
     end
 
+    def get_rating_plan(id)
+      api_request("APIerSv1.GetRatingPlan", id)
+    end
+
+    def remove_rating_plan(id)
+      api_request("APIerSv1.RemoveRatingPlan", id)
+    end
+
     def set_rating_profile(rating_plan_activations:, category:, subject:, tenant: nil, overwrite: nil, **)
       api_request(
         "APIerSv1.SetRatingProfile",
