@@ -17,4 +17,5 @@ end
 
 require_relative "cgrates/configuration"
 require_relative "cgrates/client"
+require_relative "cgrates/fake_client"
 require_relative "cgrates/response"

@@ -1,1 +1,3 @@
-Response = Data.define(:id, :result)
+module CGRateS
+  Response = Data.define(:id, :result)
+end

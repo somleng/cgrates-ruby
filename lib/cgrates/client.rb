@@ -3,7 +3,17 @@ require "json"
 
 module CGRateS
   class Client
-    class APIError < StandardError; end
+    class APIError < StandardError
+      attr_reader :response
+
+      def initialize(message, response:)
+        super(message)
+        @response = response
+      end
+    end
+
+    class NotFoundError < APIError; end
+    class MaxUsageExceededError < APIError; end
 
     attr_reader :host, :http_client, :jsonrpc_endpoint
 
@@ -140,6 +150,52 @@ module CGRateS
       )
     end
 
+    def get_rating_plan(id)
+      api_request("APIerSv1.GetRatingPlan", id)
+    end
+
+    def remove_rating_plan(id)
+      api_request("APIerSv1.RemoveRatingPlan", id)
+    end
+
+    def set_rating_profile(rating_plan_activations:, category:, subject:, tenant: nil, overwrite: nil, **)
+      api_request(
+        "APIerSv1.SetRatingProfile",
+        "RatingPlanActivations" => rating_plan_activations.map do
+          {
+            "ActivationTime" => it[:activation_time],
+            "FallbackSubjects" => it[:fallback_subjects],
+            "RatingPlanId" => it[:rating_plan_id]
+          }
+        end,
+        "Category" => category,
+        "Subject" => subject,
+        "Tenant" => tenant,
+        "Overwrite" => overwrite,
+        **
+      )
+    end
+
+    def get_rating_profile(tenant:, category:, subject:, **)
+      api_request(
+        "APIerSv1.GetRatingProfile",
+        "Tenant" => tenant,
+        "Category" => category,
+        "Subject" => subject,
+        **
+      )
+    end
+
+    def remove_rating_profile(tenant:, category:, subject:, **)
+      api_request(
+        "APIerSv1.RemoveRatingProfile",
+        "Tenant" => tenant,
+        "Category" => category,
+        "Subject" => subject,
+        **
+      )
+    end
+
     def set_account(account:, tenant: nil, **)
       api_request(
         "APIerSv2.SetAccount",
@@ -183,7 +239,144 @@ module CGRateS
       )
     end
 
+    def add_balance(**)
+      balance_request("APIerSv1.AddBalance", **)
+    end
+
+    def debit_balance(**)
+      balance_request("APIerSv1.DebitBalance", **)
+    end
+
+    def get_cdrs(tenants: [], origin_ids: [], not_costs: [], order_by: "OrderID", extra_args: {}, limit: nil, **)
+      api_request(
+        "APIerSv2.GetCDRs",
+        "Tenants" => tenants,
+        "OrderBy" => order_by,
+        "ExtraArgs" => extra_args,
+        "Limit" => limit,
+        "OriginIDs" => origin_ids,
+        "NotCosts" => not_costs,
+        **
+      )
+    end
+
+    def process_external_cdr(category:, request_type:, tor:, tenant:, account:, subject: nil, destination:, answer_time:, setup_time:, usage:, origin_id:, **)
+      api_request(
+        "CDRsV1.ProcessExternalCDR",
+        "Category" => category,
+        "RequestType" => request_type,
+        "ToR" => tor,
+        "Tenant" => tenant,
+        "Account" => account,
+        "Subject" => subject,
+        "Destination" => destination,
+        "AnswerTime" => answer_time,
+        "SetupTime" => setup_time,
+        "Usage" => usage,
+        "OriginId" => origin_id,
+        **
+      )
+    end
+
+    def set_charger_profile(id:, tenant:, **)
+      api_request(
+        "APIerSv1.SetChargerProfile",
+        "ID" => id,
+        "Tenant" => tenant,
+        **
+      )
+    end
+
+    def get_charger_profile(id:, tenant:, **)
+        api_request(
+        "APIerSv1.GetChargerProfile",
+        "ID" => id,
+        "Tenant" => tenant,
+        **
+      )
+    end
+
+    def remove_charger_profile(id:, tenant:, **)
+      api_request(
+        "APIerSv1.RemoveChargerProfile",
+        "ID" => id,
+        "Tenant" => tenant,
+        **
+      )
+    end
+
+    def get_cost(tenant:, subject:, category:, destination:, usage:, **)
+      api_request(
+        "APIerSv1.GetCost",
+        "Tenant" => tenant,
+        "Subject" => subject,
+        "Category" => category,
+        "Destination" => destination,
+        "Usage" => usage,
+        **
+      )
+    end
+
+    def get_max_session_time(tenant:, account:, category:, destination:, time_start: nil, time_end: nil, tor: nil, **)
+      max_duration_seconds = 3 * 60 * 60
+      time_start ||= Time.now
+      time_end ||= time_start + max_duration_seconds
+
+      api_request(
+        "Responder.GetMaxSessionTime",
+        "Tenant" => tenant,
+        "Account" => account,
+        "Category" => category,
+        "Destination" => destination,
+        "TimeStart" => time_start.utc.iso8601,
+        "TimeEnd" => time_end.utc.iso8601,
+        "ToR" => tor,
+        **
+      )
+    end
+
+    def get_max_usage(tenant:, account:, category:, destination:, request_type:, tor:, **)
+      api_request(
+        "APIerSv1.GetMaxUsage",
+        "Tenant" => tenant,
+        "Account" => account,
+        "RequestType" => request_type,
+        "Category" => category,
+        "Destination" => destination,
+        "ToR" => tor,
+        **
+      )
+    end
+
     private
+
+    def balance_request(method, account:, tenant:, balance_type:, value:, balance:, overwrite: false, action_extra_data: {}, cdrlog: false, **)
+      api_request(
+        method,
+        {
+          "Account" => account,
+          "Tenant" => tenant,
+          "BalanceType" => balance_type,
+          "Value" => value.to_f,
+          "Balance" => {
+            "ID" => balance[:id],
+            "ExpiryTime" => balance.fetch(:expiry_time, "*unlimited"),
+            "RatingSubject" => balance[:rating_subject],
+            "Categories" => balance[:categories],
+            "DestinationIDs" => balance.fetch(:destination_ids, "*any"),
+            "TimingIDs" => balance[:timing_ids],
+            "Weight" => balance.fetch(:weight, 10),
+            "SharedGroups" => balance[:shared_groups],
+            "Blocker" => balance.fetch(:blocker, false),
+            "Disabled" => balance.fetch(:disabled, false)
+          },
+          "ActionExtraData" => action_extra_data,
+          "Overwrite" => overwrite,
+          "Cdrlog" => cdrlog,
+          **
+        }
+      )
+    end
 
     def api_request(method, *params)
       response = http_client.post(
@@ -203,13 +396,29 @@ module CGRateS
       end
 
       if error_message
-        raise(APIError, "Invalid response from CGRateS API: #{error_message}")
+        raise(
+          error_class_from(error_message).new(
+            "Invalid response from CGRateS API: #{error_message}",
+            response: response.body
+          )
+        )
       end
 
       Response.new(
         id: response.body.fetch("id"),
         result: response.body.fetch("result")
       )
+    end
+
+    def error_class_from(error_message)
+      case error_message
+      when "NOT_FOUND"
+        NotFoundError
+      when /MAX_USAGE_EXCEEDED/
+        MaxUsageExceededError
+      else
+        APIError
+      end
     end
 
     def set_tp_resource(method, tp_id:, id:, &)
